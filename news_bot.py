@@ -153,7 +153,7 @@ def send_news(category, title, summary, pub_date, link, image_url, breaking):
         + "📌 <b>" + title + "</b>\n\n"
         + summary + "\n\n"
         + "🕐 " + (pub_date[:16] if pub_date else "") + "\n"
-        + "🔗 <a href='" + link + "'>পুরো খবর পড়ুন</a>"
+        + "🔗 <a href='" + link + "'>Read the full story</a>"
     )
 
     if image_url:
