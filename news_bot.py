@@ -22,6 +22,7 @@ NEWS_FEEDS = {
     "Prothom Alo":     "https://www.prothomalo.com/feed",
     "Daily Star":      "https://www.thedailystar.net/arcio/rss/",
     "Bdnews24":        "https://bdnews24.com/feed",
+    "AssociatedPress": "https://apnews.com/",
 }
 
 sent_links = set()
