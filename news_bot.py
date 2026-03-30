@@ -23,6 +23,7 @@ NEWS_FEEDS = {
     "Prothom Alo":     "https://www.prothomalo.com/feed",
     "Daily Star":      "https://www.thedailystar.net/arcio/rss/",
     "Bdnews24":        "https://bdnews24.com/feed",
+    "TehranTime":      "https://www.tehrantimes.com",
 }
 
 # কিওয়ার্ড ফিল্টার — এই শব্দ থাকলে Breaking News হিসেবে পাঠাবে
