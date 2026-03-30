@@ -22,7 +22,6 @@ NEWS_FEEDS = {
     "Prothom Alo":     "https://www.prothomalo.com/feed",
     "Daily Star":      "https://www.thedailystar.net/arcio/rss/",
     "Bdnews24":        "https://bdnews24.com/feed",
-    "AssociatedPress": "https://apnews.com/",
 }
 
 sent_links = set()
@@ -122,8 +121,8 @@ def load_existing_links():
 if __name__ == "__main__":
     print("News Bot starting...")
     load_existing_links()
-    send_telegram("✅ <b>News Bot চালু হয়েছে!</b> নতুন নিউজ আসলে সাথে সাথে পাঠাবো।")
-    schedule.every(1).minutes.do(check_new_news)
+    # startup message removed
+    schedule.every(5).minutes.do(check_new_news)
     print("Bot running... Checking every 5 minutes.")
     while True:
         schedule.run_pending()
