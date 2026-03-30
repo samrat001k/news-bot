@@ -24,7 +24,8 @@ NEWS_FEEDS = {
     "Bdnews24":        "https://bdnews24.com/feed",
 }
 
-NEWS_PER_CATEGORY = 2
+# আগে দেখা লিংক সেভ করে রাখবে — একই নিউজ দুইবার পাঠাবে না
+sent_links = set()
 
 def summarize_news(title, description):
     try:
@@ -53,53 +54,74 @@ def send_telegram(message):
         print("Telegram error: " + str(e))
         return False
 
-sent_links = set()
-
-def fetch_and_send_news():
-    print("Fetching news...")
-    send_telegram("🌐 <b>News update starting...</b>")
-    time.sleep(1)
+def check_new_news():
+    print("Checking for new news...")
+    new_count = 0
 
     for category, feed_url in NEWS_FEEDS.items():
         try:
             feed = feedparser.parse(feed_url)
-            count = 0
-            send_telegram("📰 <b>-- " + category + " --</b>")
-            time.sleep(1)
 
             for entry in feed.entries:
-                if count >= NEWS_PER_CATEGORY:
-                    break
                 link = entry.get("link", "")
-                if link in sent_links:
+                if not link or link in sent_links:
                     continue
+
+                # নতুন নিউজ পাওয়া গেছে!
                 title = entry.get("title", "No title")
                 description = entry.get("summary", "")
                 pub_date = entry.get("published", "")
+
                 summary = summarize_news(title, description)
+
                 message = (
+                    "🔴 <b>[" + category + "]</b>\n\n"
                     "<b>" + title + "</b>\n\n"
                     + summary + "\n\n"
                     + (pub_date[:16] if pub_date else "") + "\n"
                     + "<a href='" + link + "'>Read full news</a>"
                 )
+
                 if send_telegram(message):
                     sent_links.add(link)
-                    count += 1
-                    print("Sent: " + title[:50])
+                    new_count += 1
+                    print("New news sent: " + title[:50])
                     time.sleep(2)
+
         except Exception as e:
             print("Error in " + category + ": " + str(e))
             continue
 
-    send_telegram("✅ <b>All news updated! Next update in 1 hour.</b>")
-    print("Done!")
+    if new_count > 0:
+        print(str(new_count) + " new news sent!")
+    else:
+        print("No new news found.")
+
+# প্রথমবার সব পুরনো লিংক লোড করো — পাঠাবে না, শুধু মনে রাখবে
+def load_existing_links():
+    print("Loading existing news links (will not send these)...")
+    for category, feed_url in NEWS_FEEDS.items():
+        try:
+            feed = feedparser.parse(feed_url)
+            for entry in feed.entries:
+                link = entry.get("link", "")
+                if link:
+                    sent_links.add(link)
+        except:
+            continue
+    print("Loaded " + str(len(sent_links)) + " existing links. Now watching for NEW news...")
 
 if __name__ == "__main__":
     print("News Bot starting...")
-    fetch_and_send_news()
-    schedule.every(1).hours.do(fetch_and_send_news)
-    print("Bot running...")
+
+    # প্রথমে পুরনো নিউজ লোড করো যাতে পুরনো নিউজ না পাঠায়
+    load_existing_links()
+    send_telegram("✅ <b>News Bot চালু হয়েছে!</b> নতুন নিউজ আসলে সাথে সাথে পাঠাবো।")
+
+    # প্রতি ৫ মিনিটে চেক করবে
+    schedule.every(5).minutes.do(check_new_news)
+
+    print("Bot running... Checking every 5 minutes for new news.")
     while True:
         schedule.run_pending()
-        time.sleep(60)
+        time.sleep(30)
