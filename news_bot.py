@@ -24,20 +24,28 @@ NEWS_FEEDS = {
     "Bdnews24":        "https://bdnews24.com/feed",
 }
 
-# আগে দেখা লিংক সেভ করে রাখবে — একই নিউজ দুইবার পাঠাবে না
 sent_links = set()
 
 def summarize_news(title, description):
     try:
         url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY
-        prompt = "Summarize this news in 2-3 sentences in Bengali (Bangla). Only write the summary, nothing else.\n\nTitle: " + title + "\nDescription: " + description
+        prompt = """Analyze this news and give me the key points in Bengali (Bangla) as bullet points.
+Format exactly like this:
+• [first key point in Bengali]
+• [second key point in Bengali]
+• [third key point in Bengali]
+
+Only write the bullet points, nothing else. Maximum 3 bullets. Each bullet should be short (one line).
+
+Title: """ + title + """
+Description: """ + description
         payload = {"contents": [{"parts": [{"text": prompt}]}]}
         response = requests.post(url, json=payload)
         data = response.json()
         return data["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
         print("Gemini error: " + str(e))
-        return description[:200] if description else title
+        return "• " + (description[:100] if description else title)
 
 def send_telegram(message):
     url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage"
@@ -67,7 +75,6 @@ def check_new_news():
                 if not link or link in sent_links:
                     continue
 
-                # নতুন নিউজ পাওয়া গেছে!
                 title = entry.get("title", "No title")
                 description = entry.get("summary", "")
                 pub_date = entry.get("published", "")
@@ -75,17 +82,18 @@ def check_new_news():
                 summary = summarize_news(title, description)
 
                 message = (
-                    "🔴 <b>[" + category + "]</b>\n\n"
-                    "<b>" + title + "</b>\n\n"
+                    "🔴 <b>[" + category + "]</b>\n"
+                    "━━━━━━━━━━━━━━━\n"
+                    "📌 <b>" + title + "</b>\n\n"
                     + summary + "\n\n"
-                    + (pub_date[:16] if pub_date else "") + "\n"
-                    + "<a href='" + link + "'>Read full news</a>"
+                    + "🕐 " + (pub_date[:16] if pub_date else "") + "\n"
+                    + "🔗 <a href='" + link + "'>পুরো খবর পড়ুন</a>"
                 )
 
                 if send_telegram(message):
                     sent_links.add(link)
                     new_count += 1
-                    print("New news sent: " + title[:50])
+                    print("Sent: " + title[:50])
                     time.sleep(2)
 
         except Exception as e:
@@ -97,9 +105,8 @@ def check_new_news():
     else:
         print("No new news found.")
 
-# প্রথমবার সব পুরনো লিংক লোড করো — পাঠাবে না, শুধু মনে রাখবে
 def load_existing_links():
-    print("Loading existing news links (will not send these)...")
+    print("Loading existing news links...")
     for category, feed_url in NEWS_FEEDS.items():
         try:
             feed = feedparser.parse(feed_url)
@@ -109,19 +116,14 @@ def load_existing_links():
                     sent_links.add(link)
         except:
             continue
-    print("Loaded " + str(len(sent_links)) + " existing links. Now watching for NEW news...")
+    print("Loaded " + str(len(sent_links)) + " existing links. Watching for NEW news...")
 
 if __name__ == "__main__":
     print("News Bot starting...")
-
-    # প্রথমে পুরনো নিউজ লোড করো যাতে পুরনো নিউজ না পাঠায়
     load_existing_links()
     send_telegram("✅ <b>News Bot চালু হয়েছে!</b> নতুন নিউজ আসলে সাথে সাথে পাঠাবো।")
-
-    # প্রতি ৫ মিনিটে চেক করবে
     schedule.every(5).minutes.do(check_new_news)
-
-    print("Bot running... Checking every 5 minutes for new news.")
+    print("Bot running... Checking every 5 minutes.")
     while True:
         schedule.run_pending()
         time.sleep(30)
