@@ -123,7 +123,7 @@ if __name__ == "__main__":
     print("News Bot starting...")
     load_existing_links()
     send_telegram("✅ <b>News Bot চালু হয়েছে!</b> নতুন নিউজ আসলে সাথে সাথে পাঠাবো।")
-    schedule.every(5).minutes.do(check_new_news)
+    schedule.every(1).minutes.do(check_new_news)
     print("Bot running... Checking every 5 minutes.")
     while True:
         schedule.run_pending()
