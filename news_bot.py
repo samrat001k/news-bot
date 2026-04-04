@@ -60,6 +60,11 @@ JOB_SOURCES = [
         "url": "https://ictd.gov.bd/site/view/notices",
         "emoji": "💻"
     },
+        {
+        "name": "BDjobs Government",
+        "url": "https://bdjobs.com/h/jobs?requestType=government",
+        "emoji": "📋"
+    },
     {
         "name": "BDjobs Government",
         "url": "https://www.bdjobs.com/jobssearched.asp?TypeJobs=2&AdType=1",
