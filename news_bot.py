@@ -75,6 +75,41 @@ JOB_SOURCES = [
         "url": "https://ejobsbd.com/government-job/",
         "emoji": "📌"
     },
+        {
+        "name": "ejobsbd.com",
+        "url": "https://alljobs.teletalk.com.bd/jobs/government",
+        "emoji": "📌"
+    },
+            {
+        "name": "ejobsbd.com",
+        "url": "https://bpsc.gov.bd/",
+        "emoji": "📌"
+    },
+            {
+        "name": "ejobsbd.com",
+        "url": "https://erecruitment.bb.org.bd/",
+        "emoji": "📌"
+    },
+            {
+        "name": "ejobsbd.com",
+        "url": "https://ntrca.gov.bd/",
+        "emoji": "📌"
+    },
+            {
+        "name": "railway.com",
+        "url": "https://railway.gov.bd/",
+        "emoji": "📌"
+    },
+            {
+        "name": "potirokkha.com",
+        "url": "https://mod.gov.bd/",
+        "emoji": "📌"
+    },
+            {
+        "name": "joybangla.com",
+        "url": "https://mod.gov.bd/",
+        "emoji": "📌"
+    },
 ]
 
 # =============================================
